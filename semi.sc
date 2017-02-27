@@ -6,6 +6,8 @@
 
 
 
+
+
 (
 // RUN THIS NEXT TO LOAD COMMON MODULES + WORK-SPECIFIC STUFF
 // (rerun after stopping sound with CMD-PERIOD ... )
@@ -39,6 +41,30 @@
 
 
 
+(
+
+var pattern, stream;
+pattern = Pbind(
+	\xyx, Pseq([1,2,3])
+);
+stream = pattern.asStream;
+4.do({ stream.next(Event.new).postln; });
+
+)
+
+(
+var pattern, stream;
+pattern = Pseq([
+	Pbind( \abc, Pseq([1,2,3]) ),
+	Pbind( \def, Pseq([4,5,6]) ),
+	Pbind( \xyz, Pseq([7,8,9]) )
+]);
+stream = pattern.asStream;
+stream.postln;
+10.do({ stream.next(Event.new).postln });
+)
+
+
 
 
 
@@ -51,15 +77,13 @@ p = Pbind(
 	*[
 		instrument: "semi.tap",
 		dur: 1/8,
-		freq: Pseq([ref_pitch*15/16, ref_pitch*16/15, ref_pitch, ref_pitch, ref_pitch*16/15],24),
+		freq: Pseq([ [ref_pitch*14/16, ref_pitch*17/15], ref_pitch, ref_pitch, ref_pitch*16/15],24),
 		amp:0.2,
 	]
 );
 )
 
 p.play;
-
-60!2;
 
 
 
