@@ -12,8 +12,9 @@
 // RUN THIS NEXT TO LOAD COMMON MODULES + WORK-SPECIFIC STUFF
 // (rerun after stopping sound with CMD-PERIOD ... )
 ~ss.loadCommon({
-	SynthDef( "semi.tap", { arg t_amp=0.2, freq=440;
+	SynthDef( "semi.tap", { | freq=440, t_amp | // NOTE: t_amp = amp made as a TrigControl
 		var sig;
+
 
 		sig = Resonz.ar(
 			WhiteNoise.ar(70!2) * Decay2.kr( t_amp, 0.002, 0.1 ),
@@ -71,14 +72,14 @@ stream.postln;
 // ~ss.buf.drone("japan-cicadas", "DR0000_0192");
 
 (
-var ref_pitch = 49.midicps;
+var ref_pitch = 60.midicps;
 
 p = Pbind(
 	*[
 		instrument: "semi.tap",
 		dur: 1/8,
-		freq: Pseq([ [ref_pitch*14/16, ref_pitch*17/15], ref_pitch, ref_pitch, ref_pitch*16/15],24),
-		amp:0.2,
+		freq: Pseq([ ref_pitch*17/15*2, ref_pitch, ref_pitch, ref_pitch*16/15],24),
+		amp: Prand([0.2,0.3,0.4,0.8], inf),
 	]
 );
 )
