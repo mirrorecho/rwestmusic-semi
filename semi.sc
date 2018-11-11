@@ -4,28 +4,16 @@
 ("/Users/randallwest/code/mirrorecho/superstudio/ss.sc").loadPaths;
 )
 
-
-
-
+~ss.projectPath;
 
 (
 // RUN THIS NEXT TO LOAD COMMON MODULES + WORK-SPECIFIC STUFF
 // (rerun after stopping sound with CMD-PERIOD ... )
 ~ss.loadCommon({
-	SynthDef( "semi.tap", { | freq=440, t_amp | // NOTE: t_amp = amp made as a TrigControl
-		var sig;
+	// ~ss.load(["synth.library"]);
+	~ss.projectPath = "".resolveRelative;
+	(~ss.projectPath ++ "synths.sc").loadPaths;
 
-
-		sig = Resonz.ar(
-			WhiteNoise.ar(70!2) * Decay2.kr( t_amp, 0.002, 0.1 ),
-			freq,
-			0.02,
-			4
-		).distort * 0.4;
-
-		Out.ar( ~ss.bus.master, sig );
-		DetectSilence.ar( sig, doneAction: 2 );
-	}).add;
 	/*
 	// MIDI: simple defs for midi messaging
 	~ss.load(["midi"], {
@@ -36,11 +24,14 @@
 	// BUFFERS / SOUND LIBRARY:
 	~ss.buf.libraryPath = "/Users/randallwest/Echo/Sound/Library/";
 	~ss.buf.loadLibrary("japan-cicadas");
-
+	~ss.buf.loadLibrary("shamisen");
+	~ss.buf.loadLibrary("plucky");
 });
 )
 
-
+c = ~ss.buf.play("japan-cicadas", "0192-insects-honen-in-temple", ['start',0] );
+c = ~ss.buf.play("japan-cicadas", "0191-insects-temple", ['start',7]);
+c.free;
 
 (
 
@@ -65,26 +56,53 @@ stream.postln;
 10.do({ stream.next(Event.new).postln });
 )
 
+~ss.buf['plucky']['E3-glass-pizz-1'].play;
 
-
+BufSampleRate.ir(~ss.buf['japan-cicadas']['0191-insects-temple']).poll;
 
 
 // ~ss.buf.drone("japan-cicadas", "DR0000_0192");
+
+
+(
+p = Pbind(
+	*[
+		instrument: "semi.tap",
+		freq: Prand([220,220 * 1.5], 12),
+		releaseTime:Pwhite(0.2,0.8),
+		dur: 1/4,
+		start: Pwhite(0.0,7),
+		// freq: Pseq([ ref_pitch*17/15*2, ref_pitch, ref_pitch, ref_pitch*16/15],24),
+		amp: Pseq(#[0.9,0.6,0.7,0.6], 16) * Pwhite(0.9, 1.1) * 2,
+		rate: Pwhite(0.8,1.2)
+	]
+).play;
+);
+
 
 (
 var ref_pitch = 60.midicps;
 
 p = Pbind(
 	*[
-		instrument: "semi.tap",
+		instrument: "ss.buf.perc",
+		buffer: Prand([
+			// ~ss.buf['japan-cicadas']['0185-insects-water-kyoto'],
+			~ss.buf['japan-cicadas']['0191-insects-temple'],
+		], inf),
+		releaseTime:Pwhite(0.1,0.4),
 		dur: 1/8,
-		freq: Pseq([ ref_pitch*17/15*2, ref_pitch, ref_pitch, ref_pitch*16/15],24),
-		amp: Prand([0.2,0.3,0.4,0.8], inf),
+		start: Pwhite(0.0,7),
+		// freq: Pseq([ ref_pitch*17/15*2, ref_pitch, ref_pitch, ref_pitch*16/15],24),
+		amp: Pseq(#[0.9,0.6,0.7,0.6], 16) * Pwhite(0.9, 1.1) * 2,
+		rate: Pwhite(0.9,1)
 	]
+).play;
 );
-)
 
 p.play;
+p.pause;
+p.stop;
 
 
 
